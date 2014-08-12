@@ -35,6 +35,49 @@ var _variablesToEliminate = [
 	{'d': 3}
 ]
 
+var _cpts2 = [
+	{
+		head: ['a'],
+		tail: []
+	},
+	{
+		head: ['b'],
+		tail: ['a']
+	},
+	{
+		head: ['c'],
+		tail: []
+	},
+	{
+		head: ['d'],
+		tail: []
+	},
+	{
+		head: ['e'],
+		tail: ['a','c','d']
+	},
+	{
+		head: ['f'],
+		tail: ['b','e']
+	}
+]
+
+var _variables2 = [
+	{'a': 5},
+	{'b': 2},
+	{'c': 2},
+	{'d': 2},
+	{'e': 2},
+	{'f': 2}
+]
+
+var _variablesToEliminate2 = [
+	{'a': 5},
+	{'b': 2},
+	{'c': 2},
+	{'e': 2}
+]
+
 // FUNCTION
 // Scores the current variables of the CPTs using Min Neighbors
 function scoreMinNeighbor(variables, cpts) {
@@ -68,7 +111,12 @@ function scoreMinNeighbor(variables, cpts) {
 
 // FUNCTION
 // Removes a variable v by multiplying the CPTs with the variable v
-function removeVariable(variable, cpts) {
+function removeVariable(_variable, cpts) {
+	// unroll variable value
+	var variable = ''
+	for (var key in _variable) {
+		variable = key
+	}
 	var product = { head: [], tail: [] }
 	// Loop on all CPTs
 	var indexesToRemove = []
@@ -120,68 +168,55 @@ function multiply(cpt1, cpt2) {
 }
 
 // FUNCTION
-// Find an elimination ordering
-function findEliminationOrdering(variablesToEliminate, cpts) {
-	// creating tie structure
-	var ties = {}
-	for (var i = 0; i < variablesToEliminate.length; i++) {
-		ties[i] = {
-			isTied: false,
-			variablesAlreadyChosen: []
+// Find one elimination ordering
+function findOneEliminationOrdering(variablesToEliminate, cpts, eliminationOrdering, eliminationOrderings) {
+	var scores = scoreMinNeighbor(variablesToEliminate,cpts)
+	var variablesWithMinimunScore = findVariablesWithMinimunScore(scores, variablesToEliminate)
+
+	var variablesWithMinimunScore = variablesWithMinimunScore.slice(0)
+	var copyOfCpts = cpts.slice(0)
+	if (variablesWithMinimunScore.length > 1) {
+		for (var i = 0; i < variablesWithMinimunScore.length; i++) {
+			copyOfCpts = removeVariable(variablesWithMinimunScore[i], copyOfCpts)
+			eliminationOrdering.push(variablesWithMinimunScore[i])
+			var tmpCopy = variablesToEliminate.slice(0)
+			tmpCopy.splice(findIndexEqualObject(variablesWithMinimunScore[i],tmpCopy),1)
+			findOneEliminationOrdering(tmpCopy, copyOfCpts.slice(0), eliminationOrdering, eliminationOrderings)
+			eliminationOrdering.pop()
+			if (eliminationOrdering.length == 0) { copyOfCpts = cpts.slice(0) }
 		}
-	}
-	// Find alimination orderings throughout the ties
-	var eliminationOrderings = []
-	var eliminationOrdering = []
-	copyOfvariablesToEliminate = variablesToEliminate.slice(0)
-	// find one elimination ordering
-	for (var i = 0; i < variablesToEliminate.length; i++) {
-		var scores = scoreMinNeighbor(copyOfvariablesToEliminate,cpts)
-		// Finding variable with minimun score
-		var variablesWithMinimunScore = findVariablesWithMinimunScore(scores)
-		// managing ties
-		var thereIsAtie = (variablesWithMinimunScore.length > 1) ? true : false;
-		var variableWithMinimunScore
-		if (thereIsAtie) {
-			ties[i].isTied = true
-			var indexOfChosenVariableInTie
-			for (var j = 0; j < variablesWithMinimunScore.length; j++) {
-				if (ties[i].variablesAlreadyChosen.indexOf(variablesWithMinimunScore[j]) == -1) {
-					ties[i].variablesAlreadyChosen.push(variablesWithMinimunScore[j])
-					indexOfChosenVariableInTie = j
-					break
-				}
-			}
-			variableWithMinimunScore = variablesWithMinimunScore[indexOfChosenVariableInTie]
+	} else {
+		copyOfCpts = removeVariable(variablesWithMinimunScore[0], copyOfCpts)
+		eliminationOrdering.push(variablesWithMinimunScore[0])
+		var tmpCopy = variablesToEliminate.slice(0)
+		tmpCopy.splice(findIndexEqualObject(variablesWithMinimunScore[0],tmpCopy),1)
+		if (tmpCopy.length) {
+			findOneEliminationOrdering(tmpCopy, copyOfCpts.slice(0), eliminationOrdering, eliminationOrderings)
+			eliminationOrdering.pop()
+			if (eliminationOrdering.length == 0) { copyOfCpts = cpts.slice(0) }
 		} else {
-			variableWithMinimunScore = variablesWithMinimunScore[0]
+			eliminationOrderings.push(eliminationOrdering.slice(0))
+			eliminationOrdering.pop()
 		}
-		// save the variable
-		eliminationOrdering.push(variableWithMinimunScore)
-		// remove variable with minimun score
-		cpts = removeVariable(variableWithMinimunScore,cpts)
-		// remove from the list of variables to eliminate
-		copyOfvariablesToEliminate.splice(0,1);
 	}
-	eliminationOrderings.push(eliminationOrdering);
-
-	// trying to manage ties
-
-	return eliminationOrderings
 }
 
 // FUNCTION
 // Given the scores, find a variable to eliminate with the minimun score
-function findVariablesWithMinimunScore(scores) {
+function findVariablesWithMinimunScore(scores, variables) {
 	var actualMinimunScore = []
 	var variablesWithMinimunScore  = []
 	for (var variable in scores) {
 		if (actualMinimunScore.length == 0 || actualMinimunScore > scores[variable]) {
 			actualMinimunScore = scores[variable]
-			variablesWithMinimunScore = [variable]
+			variablesWithMinimunScore = []
+			variablesWithMinimunScore[0] = {}
+			variablesWithMinimunScore[0][variable] = findValueOfObjectInArray(variable,variables)
 		} else if (actualMinimunScore == scores[variable]) {
 			actualMinimunScore = scores[variable]
-			variablesWithMinimunScore.push(variable)
+			var objTemp = {}
+			objTemp[variable] = findValueOfObjectInArray(variable,variables)
+			variablesWithMinimunScore.push(objTemp)
 		}
 	}
 	return variablesWithMinimunScore

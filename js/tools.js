@@ -18,7 +18,7 @@ function union_arrays (x, y) {
 
 // Took from http://upshots.org/actionscript/javascript-splice-array-on-multiple-indices-multisplice
 // In Aug 11, 2014, 12:16 AM, with few modifications to make it work with array instead of argument
-// ARRAY METHOD
+// FUNCTION
 // splice array on multiple indices
 function multisplice (array,args) {
     // var args = Array.apply(null, arguments).slice(1);
@@ -29,4 +29,40 @@ function multisplice (array,args) {
         var index = args[i] - i;
         array.splice(index, 1);
     }        
+}
+
+// FUNCTION
+// Test if an array of array is empty
+function isArrayOfArrayEmpty(arrayOfArray) {
+  counter = 0
+  for (var i = 0; i < arrayOfArray.length; i++) {
+    if(arrayOfArray[i].length == 0) { counter++ }
+  }
+  return (counter == arrayOfArray.length) ? true : false
+}
+
+// FUNCTION
+// return the value of a array of object - key/value type -, given the key
+function findValueOfObjectInArray(keyToFind,arrayOfObject) {
+  for (var i = 0; i < arrayOfObject.length; i++) {
+    for (var key in arrayOfObject[i]) {
+      if (key == keyToFind) { return arrayOfObject[i][key] }
+    }
+  }
+  return -1
+}
+
+// FUNCTION
+// find the index of the object in a array of objects if the key and value are equal to the given one
+function findIndexEqualObject(obj,arrayOfObj) {
+  for (var i = 0; i < arrayOfObj.length; i++) {
+    for (var keyInArr in arrayOfObj[i]) {
+      for (var keyObj in obj) {
+        if (keyInArr == keyObj && arrayOfObj[i][keyInArr] == obj[keyObj]) {
+          return i
+        }
+      }
+    }
+  }
+  return -1
 }
