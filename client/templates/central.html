@@ -1,0 +1,204 @@
+<template name="templateCentral">
+
+	{{#if isCentralActivated}}
+	{{#each bn}}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">{{name}} <span class="glyphicon glyphicon-minus-sign action-btn-panel btn-delete-bn" data-toggle="tooltip" data-placement="top" title="Delete BN"></span></h3>
+		</div>
+		<div class="panel-body">
+
+			<div class="row">
+			<div class="col-md-6">
+
+			<button class="btn btn-primary btn-new-cpt">New CPT</button>
+			<hr>
+			{{#each cpts}}
+			<form class="form-inline" role="form">
+				<div class="form-group">
+					<input type="text" class="form-control" id={{_id}} value="p({{head}}|{{tail}})">
+					<button class="btn btn-primary btn-save-cpt"><span class="glyphicon glyphicon-floppy-disk" data-toggle="tooltip" data-placement="top" title="Save CPT"></span></button>
+					<button class="btn btn-danger btn-delete-cpt"><span class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Delete CPT"></span></button>
+				</div>
+			</form>
+			{{/each}}
+
+			</div>
+			<div class="col-md-6">
+
+			<button class="btn btn-primary btn-new-variable">Define Variable</button>
+			<hr>
+			{{#each variables}}
+			<form class="form-inline" role="form">
+				<div class="form-group">
+					<label>{{name}}</label> <input type="text" class="form-control" id={{_id}} value="{{cardinality}}">
+					<button class="btn btn-primary btn-save-variable"><span class="glyphicon glyphicon-floppy-disk" data-toggle="tooltip" data-placement="top" title="Save Variable"></span></button>
+					<button class="btn btn-danger btn-delete-variable"><span class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Delete Variable"></span></button>
+				</div>
+			</form>
+			{{/each}}
+
+			</div>
+			</div>
+			<!-- Min neighbors -->
+			<hr>
+			<form class="form-inline" role="form">
+	  			<div class="form-group">
+					<input type="text" class="form-control variables-to-eliminate-mn" value="{{variablesToEliminateMn}}" placeholder = "Variables to eliminate">
+					<button class="btn btn-success btn-min-neighbors">Min Neighbors</button>
+				</div>
+			</form>
+			{{#if countingsMn}}
+			<br>
+			<div class="panel panel-default">
+			<div class="panel-heading">Min Neighbors Results</div>
+			<table class="table table-hover">
+				<tr>
+					<th>Elimination Orderings</th>
+					<th>Multiplications</th>
+					<th>Additions</th>
+				</tr>
+				{{#each countingsMn}}
+				<tr>
+					<td>
+						{{#each eliminationOrdering}}
+						{{name}} 
+						{{/each}}
+					</td>
+					{{#with counting}}
+					<td>
+						{{multiplications}}
+					</td>
+					<td>
+						{{summations}}
+					</td>
+					{{/with}}
+				</tr>
+				{{/each}}
+			</table>
+			</div>
+			{{/if}}
+			<!-- Min Weight -->
+			<hr>
+			<form class="form-inline" role="form">
+	  			<div class="form-group">
+					<input type="text" class="form-control variables-to-eliminate-mw" value="{{variablesToEliminateMw}}" placeholder = "Variables to eliminate">
+					<button class="btn btn-success btn-min-weight">Min Weight</button>
+				</div>
+			</form>
+			{{#if countingsMw}}
+			<br>
+			<div class="panel panel-default">
+			<div class="panel-heading">Min Weight Results</div>
+			<table class="table table-hover">
+				<tr>
+					<th>Elimination Orderings</th>
+					<th>Multiplications</th>
+					<th>Additions</th>
+				</tr>
+				{{#each countingsMw}}
+				<tr>
+					<td>
+						{{#each eliminationOrdering}}
+						{{name}} 
+						{{/each}}
+					</td>
+					{{#with counting}}
+					<td>
+						{{multiplications}}
+					</td>
+					<td>
+						{{summations}}
+					</td>
+					{{/with}}
+				</tr>
+				{{/each}}
+			</table>
+			</div>
+			{{/if}}
+			<!-- Min Fill -->
+			<hr>
+			<form class="form-inline" role="form">
+	  			<div class="form-group">
+					<input type="text" class="form-control variables-to-eliminate-mf" value="{{variablesToEliminateMf}}" placeholder = "Variables to eliminate">
+					<button class="btn btn-success btn-min-fill">Min Fill</button>
+				</div>
+			</form>
+			{{#if countingsMf}}
+			<br>
+			<div class="panel panel-default">
+			<div class="panel-heading">Min Fill Results</div>
+			<table class="table table-hover">
+				<tr>
+					<th>Elimination Orderings</th>
+					<th>Multiplications</th>
+					<th>Additions</th>
+				</tr>
+				{{#each countingsMf}}
+				<tr>
+					<td>
+						{{#each eliminationOrdering}}
+						{{name}} 
+						{{/each}}
+					</td>
+					{{#with counting}}
+					<td>
+						{{multiplications}}
+					</td>
+					<td>
+						{{summations}}
+					</td>
+					{{/with}}
+				</tr>
+				{{/each}}
+			</table>
+			</div>
+			{{/if}}
+			<!-- Weightes Min Fill -->
+			<hr>
+			<form class="form-inline" role="form">
+	  			<div class="form-group">
+					<input type="text" class="form-control variables-to-eliminate-wmf" value="{{variablesToEliminateWmf}}" placeholder = "Variables to eliminate">
+					<button class="btn btn-success btn-weighted-min-fill">Weighted Min Fill</button>
+				</div>
+			</form>
+			{{#if countingsWmf}}
+			<br>
+			<div class="panel panel-default">
+			<div class="panel-heading">Weighted Min Fill Results</div>
+			<table class="table table-hover">
+				<tr>
+					<th>Elimination Orderings</th>
+					<th>Multiplications</th>
+					<th>Additions</th>
+				</tr>
+				{{#each countingsWmf}}
+				<tr>
+					<td>
+						{{#each eliminationOrdering}}
+						{{name}} 
+						{{/each}}
+					</td>
+					{{#with counting}}
+					<td>
+						{{multiplications}}
+					</td>
+					<td>
+						{{summations}}
+					</td>
+					{{/with}}
+				</tr>
+				{{/each}}
+			</table>
+			</div>
+			{{/if}}
+		</div>
+	</div>
+	{{/each}}
+	{{else}}
+		<div class="jumbotron">
+			<h1>Dashboard</h1>
+			<p>Define the CPTs and compute elimination orderings</p>
+		</div>
+	{{/if}}
+</template>

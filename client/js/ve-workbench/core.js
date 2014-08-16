@@ -2,7 +2,7 @@
 
 // FUNCTION
 // Removes a variable v by multiplying the CPTs with the variable v
-function eliminateVariable(_variable, cpts) {
+eliminateVariable = function(_variable, cpts) {
 	// unroll variable value
 	var variable = ''
 	for (var key in _variable) {
@@ -30,7 +30,7 @@ function eliminateVariable(_variable, cpts) {
 
 // FUNCTION
 // Sumout a variable from the CPT
-function sumOut(variable,cpt) {
+sumOut = function(variable,cpt) {
 	// remove the variable from head and tail
 	var indexOfVariableInHead = cpt.head.indexOf(variable)
 	if (indexOfVariableInHead != -1) {
@@ -45,7 +45,7 @@ function sumOut(variable,cpt) {
 
 // FUNCTION
 // Multiply two CPTs
-function multiply(cpt1, cpt2) {
+multiply = function(cpt1, cpt2) {
 	// The head variables are always in the head of the product CPT
 	var productHead = union_arrays(cpt1.head, cpt2.head)
 	// One tail variables can go to the head if at least one of its instance is in the head
@@ -71,7 +71,7 @@ function multiply(cpt1, cpt2) {
 
 // FUNCTION
 // Scores the current variables of the CPTs using Min Neighbors
-function scoreMinNeighbor(variablesToScore, cpts, allVariables) {
+scoreMinNeighbor = function(variablesToScore, cpts, allVariables) {
 	var scores = {}
 	// Loop on each variable
 	for (var i = 0; i < variablesToScore.length; i++) {
@@ -102,7 +102,7 @@ function scoreMinNeighbor(variablesToScore, cpts, allVariables) {
 
 // FUNCTION
 // Scores the current variables of the CPTs using Min Weight
-function scoreMinWeight(variablesToScore, cpts, allVariables) {
+scoreMinWeight = function(variablesToScore, cpts, allVariables) {
 	var scores = {}
 	// Loop on each variable
 	for (var i = 0; i < variablesToScore.length; i++) {
@@ -138,7 +138,7 @@ function scoreMinWeight(variablesToScore, cpts, allVariables) {
 
 // FUNCTION
 // Scores the current variables of the CPTs using Min Fill
-function scoreMinFill(variablesToScore, cpts, allVariables) {
+scoreMinFill = function(variablesToScore, cpts, allVariables) {
 	var scores = {}
 	// Loop on each variable
 	for (var i = 0; i < variablesToScore.length; i++) {
@@ -205,7 +205,7 @@ function scoreMinFill(variablesToScore, cpts, allVariables) {
 
 // FUNCTION
 // Scores the current variables of the CPTs using Weighted Min Fill
-function scoreWeightedMinFill(variablesToScore, cpts, allVariables) {
+scoreWeightedMinFill = function(variablesToScore, cpts, allVariables) {
 	var scores = {}
 	// Loop on each variable
 	for (var i = 0; i < variablesToScore.length; i++) {
@@ -276,7 +276,7 @@ function scoreWeightedMinFill(variablesToScore, cpts, allVariables) {
 
 // FUNCTION
 // Find one elimination ordering
-function findOneEliminationOrdering(variablesToEliminate, cpts, eliminationOrdering, eliminationOrderings, scoringFunction, allVariables) {
+findOneEliminationOrdering = function(variablesToEliminate, cpts, eliminationOrdering, eliminationOrderings, scoringFunction, allVariables) {
 	var scores = scoringFunction(variablesToEliminate,cpts, allVariables)
 	var variablesWithMinimunScore = findVariablesWithMinimunScore(scores, variablesToEliminate)
 
@@ -310,7 +310,7 @@ function findOneEliminationOrdering(variablesToEliminate, cpts, eliminationOrder
 
 // FUNCTION
 // Given the scores, find a variable to eliminate with the minimun score
-function findVariablesWithMinimunScore(scores, variables) {
+findVariablesWithMinimunScore = function(scores, variables) {
 	var actualMinimunScore = []
 	var variablesWithMinimunScore  = []
 	for (var variable in scores) {
@@ -335,7 +335,7 @@ function findVariablesWithMinimunScore(scores, variables) {
 
 // FUNCTION
 // Performs a elimination orderings, counting the computations
-function countComputations(eliminationOrdering,cpts,variables) {
+countComputations = function(eliminationOrdering,cpts,variables) {
 	countings = {'multiplications': 0, 'summations': 0}
 	for (var i = 0; i < eliminationOrdering.length; i++) {
 		// unroll variable value
@@ -370,7 +370,7 @@ function countComputations(eliminationOrdering,cpts,variables) {
 
 // FUNCTION
 // count the multiplications or summations in CPT (multiplying the variable's cardinalities)
-function countMultiplicationsOrSummations(cpt,variables) {
+countMultiplicationsOrSummations = function(cpt,variables) {
 	product = 1;
 	for (var i = 0; i < cpt.head.length; i++) {
 		product *= findValueOfObjectInArray(cpt.head[i],variables)
@@ -383,7 +383,7 @@ function countMultiplicationsOrSummations(cpt,variables) {
 
 // FUNCTION
 // count the multiplications or summations in CPT (multiplying the variable's cardinalities) for all possible elimination orderings
-function countComputationsFromAllPossibleEliminationOrderings(variablesToEliminate,cpts,variables,scoringFunction) {
+countComputationsFromAllPossibleEliminationOrderings = function(variablesToEliminate,cpts,variables,scoringFunction) {
 
 	eliminationOrdering =[]
 	eliminationOrderings = []
