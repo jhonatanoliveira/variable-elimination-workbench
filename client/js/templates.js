@@ -85,6 +85,9 @@ Template.templateCentral.events({
 				Cpt.find({bnId: bnId}).forEach(function (post) {
 					Cpt.remove({_id: post._id})
 				})
+				Variable.find({bnId: bnId}).forEach(function (post) {
+					Variable.remove({_id: post._id})
+				})
 				BayesianNetwork.remove({_id: bnId})
 			}
 		})
