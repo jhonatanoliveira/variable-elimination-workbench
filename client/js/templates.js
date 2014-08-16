@@ -57,6 +57,21 @@ Template.templateCentral.variablesToEliminateMn = function() {
 	return Session.get('variablesToEliminateMn'+bnId)
 }
 
+Template.templateCentral.variablesToEliminateMw = function() {
+	var bnId = Session.get('activatedBn');
+	return Session.get('variablesToEliminateMw'+bnId)
+}
+
+Template.templateCentral.variablesToEliminateMf = function() {
+	var bnId = Session.get('activatedBn');
+	return Session.get('variablesToEliminateMf'+bnId)
+}
+
+Template.templateCentral.variablesToEliminateWmf = function() {
+	var bnId = Session.get('activatedBn');
+	return Session.get('variablesToEliminateWmf'+bnId)
+}
+
 Template.templateCentral.countingsMn = function() {
 	var bnId = Session.get('activatedBn')
 	return Session.get('countingsMn'+bnId)
@@ -93,7 +108,7 @@ Template.templateCentral.events({
 		})
 	},
 	'click .btn-new-cpt': function(e) {
-		bootbox.prompt("Please, type the CPT in this format: p(x1,x2|x3,x4)", function(result) {                
+		bootbox.prompt("Please, type the CPT in this format: p(x1,x2|x3,x4) or p(x1)", function(result) {                
 			if (result != null) {
 				Cpt.insert(prepareCpt(result))
 			}
@@ -125,8 +140,18 @@ Template.templateCentral.events({
 		var varId = this._id
 		Variable.update({_id: varId}, {$set: {cardinality: $('#'+varId).val()}})
 	},
+	'click .btn-delete-variable': function(e) {
+		e.preventDefault()
+		var varId = this._id
+		bootbox.confirm("Are you sure?", function(result) {
+			if (result) {
+				Variable.remove({_id: varId})
+			}
+		})
+	},
 	'click .btn-min-neighbors': function(e) {
 		e.preventDefault()
+		if (checkVariablesDefinition()) {
 		var varToElim = $('.variables-to-eliminate-mn').val()
 		var bnId = Session.get('activatedBn');
 		Session.set('variablesToEliminateMn'+bnId,varToElim)
@@ -138,9 +163,13 @@ Template.templateCentral.events({
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMn'+bnId,countings)
+		} else {
+			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
+		}
 	},
 	'click .btn-min-weight': function(e) {
 		e.preventDefault()
+		if (checkVariablesDefinition()) {
 		var varToElim = $('.variables-to-eliminate-mw').val()
 		var bnId = Session.get('activatedBn');
 		Session.set('variablesToEliminateMw'+bnId,varToElim)
@@ -152,9 +181,13 @@ Template.templateCentral.events({
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMw'+bnId,countings)
+		} else {
+			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
+		}
 	},
 	'click .btn-min-fill': function(e) {
 		e.preventDefault()
+		if (checkVariablesDefinition()) {
 		var varToElim = $('.variables-to-eliminate-mf').val()
 		var bnId = Session.get('activatedBn');
 		Session.set('variablesToEliminateMf'+bnId,varToElim)
@@ -162,13 +195,17 @@ Template.templateCentral.events({
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinWeight)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinFill)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMf'+bnId,countings)
+		} else {
+			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
+		}
 	},
 	'click .btn-weighted-min-fill': function(e) {
 		e.preventDefault()
+		if (checkVariablesDefinition()) {
 		var varToElim = $('.variables-to-eliminate-wmf').val()
 		var bnId = Session.get('activatedBn');
 		Session.set('variablesToEliminateWmf'+bnId,varToElim)
@@ -176,17 +213,25 @@ Template.templateCentral.events({
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinWeight)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreWeightedMinFill)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsWmf'+bnId,countings)
+		} else {
+			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
+		}
 	}
 })
 
 function prepareCpt(result) {
 	var cpt = {}
-	cpt['head'] = result.substring(2,result.indexOf('|')).split(',')
-	cpt['tail'] = result.substring(result.indexOf('|')+1,result.indexOf(')')).split(',')
+	if (result.indexOf('|') != -1) {
+		cpt['head'] = result.substring(2,result.indexOf('|')).split(',')
+		cpt['tail'] = result.substring(result.indexOf('|')+1,result.indexOf(')')).split(',')
+	} else {
+		cpt['head'] = result.substring(2,result.indexOf(')')).split(',')
+		cpt['tail'] = []
+	}
 	cpt['bnId'] = Session.get('activatedBn')
 	return cpt
 }
@@ -235,4 +280,14 @@ function prepareCounting(countings) {
 		}
 		countings[i]['eliminationOrdering'] = newEliminationOrdering
 	}
+}
+
+checkVariablesDefinition = function() {
+	var varsSet = []
+	Variable.find({}).forEach(function (post) {
+		if (varsSet.indexOf(post.name) == -1) {
+			varsSet.push(post.name)
+		}
+	})
+	return (Cpt.find({}).count() == varsSet.length) ? true : false
 }

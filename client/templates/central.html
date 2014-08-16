@@ -12,21 +12,28 @@
 			<div class="col-md-6">
 
 			<button class="btn btn-primary btn-new-cpt">New CPT</button>
+			{{#if cpts}}
 			<hr>
 			{{#each cpts}}
 			<form class="form-inline" role="form">
 				<div class="form-group">
+					{{#if tail}}
 					<input type="text" class="form-control" id={{_id}} value="p({{head}}|{{tail}})">
+					{{else}}
+					<input type="text" class="form-control" id={{_id}} value="p({{head}})">
+					{{/if}}
 					<button class="btn btn-primary btn-save-cpt"><span class="glyphicon glyphicon-floppy-disk" data-toggle="tooltip" data-placement="top" title="Save CPT"></span></button>
 					<button class="btn btn-danger btn-delete-cpt"><span class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Delete CPT"></span></button>
 				</div>
 			</form>
 			{{/each}}
+			{{/if}}
 
 			</div>
 			<div class="col-md-6">
 
 			<button class="btn btn-primary btn-new-variable">Define Variable</button>
+			{{#if variables}}
 			<hr>
 			{{#each variables}}
 			<form class="form-inline" role="form">
@@ -37,6 +44,7 @@
 				</div>
 			</form>
 			{{/each}}
+			{{/if}}
 
 			</div>
 			</div>
@@ -197,8 +205,10 @@
 	{{/each}}
 	{{else}}
 		<div class="jumbotron">
-			<h1>Dashboard</h1>
-			<p>Define the CPTs and compute elimination orderings</p>
+			<h1>Getting Started</h1>
+			<p>1. Create a new BN</p>
+			<p>2. Create new CPTs inside the BN</p>
+			<p>3. Define the cardinality of your variables</p>
 		</div>
 	{{/if}}
 </template>
