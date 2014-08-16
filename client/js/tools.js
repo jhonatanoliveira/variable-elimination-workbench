@@ -66,3 +66,17 @@ function findIndexEqualObject(obj,arrayOfObj) {
   }
   return -1
 }
+
+// FUNCTIONS
+// return a object from an array of objects, if the given string is inside the object
+function findTheObjectWith(thisString,arrayOfObjects) {
+  var arrayOfSelectedObjects = []
+  for (var i = 0; i < arrayOfObjects.length; ++i) {
+    for (var chave in arrayOfObjects[i]) {
+      if (arrayOfObjects[i][chave].indexOf(thisString) != -1) {
+        arrayOfSelectedObjects.push(arrayOfObjects[i])
+      }
+    }
+  }
+  return arrayOfSelectedObjects
+}

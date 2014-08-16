@@ -144,11 +144,11 @@ function scoreMinFill(variablesToScore, cpts, allVariables) {
 	for (var i = 0; i < variablesToScore.length; i++) {
 		var variable = Object.keys(variablesToScore[i])[0]
 		var neighbors = []
+		var connectionsMap = {}
 		// Loop on all CPTs
 		for (var j = 0; j < cpts.length; j++) {
-			// If the variable is in the CPT...
 			if (cpts[j].head.indexOf(variable) != -1 || cpts[j].tail.indexOf(variable) != -1) {
-				// ...then fetch its neighbors
+				var connections = []
 				for (var k = 0; k < cpts[j].head.length; k++) {
 					if (cpts[j].head[k] != variable && neighbors.indexOf(cpts[j].head[k]) == -1) {
 						neighbors.push(cpts[j].head[k])
@@ -161,6 +161,40 @@ function scoreMinFill(variablesToScore, cpts, allVariables) {
 				}
 			}
 		}
+		// verify connections between neighbors
+		for (var j = 0; j < neighbors.length; j++) {
+			var selectedCpts = findTheObjectWith(neighbors[j],cpts)
+			for (var k = 0; k < selectedCpts.length; k++) {
+				for (var l = 0; l < selectedCpts[k].head.length; l++) {
+					if (selectedCpts[k].head[l] != variable && selectedCpts[k].head[l] != neighbors[j] && neighbors.indexOf(selectedCpts[k].head[l]) != -1) {
+						if (!connectionsMap[neighbors[j]]) {connectionsMap[neighbors[j]] = []}
+						connectionsMap[neighbors[j]].push(selectedCpts[k].head[l])
+					}
+				}
+				for (var l = 0; l < selectedCpts[k].tail.length; l++) {
+					if (selectedCpts[k].tail[l] != variable && selectedCpts[k].tail[l] != neighbors[j] && neighbors.indexOf(selectedCpts[k].tail[l]) != -1) {
+						if (!connectionsMap[neighbors[j]]) {connectionsMap[neighbors[j]] = []}
+						connectionsMap[neighbors[j]].push(selectedCpts[k].tail[l])
+					}
+				}
+			}
+		}
+		// Calculating scores
+		scoreCounter = 0;
+		for (var j = 0; j < neighbors.length; j++) {
+			for (var k = 0; k < neighbors.length; k++) {
+				if (neighbors[j] != neighbors[k]){
+					if (connectionsMap[neighbors[j]]){
+						if (connectionsMap[neighbors[j]].indexOf(neighbors[k]) == -1) {
+							scoreCounter++
+						}
+					} else {
+						scoreCounter++
+					}
+				}
+			}
+		}
+		scores[variable] = scoreCounter/2
 	}
 	return scores
 }
@@ -277,6 +311,7 @@ function countMultiplicationsOrSummations(cpt,variables) {
 }
 
 // FUNCTION
+// count the multiplications or summations in CPT (multiplying the variable's cardinalities) for all possible elimination orderings
 function countComputationsFromAllPossibleEliminationOrderings(variablesToEliminate,cpts,variables,scoringFunction) {
 
 	eliminationOrdering =[]
