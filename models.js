@@ -5,3 +5,5 @@ Cpt = new Meteor.Collection("Cpt")
 Variable = new Meteor.Collection("Variable")
 
 Heuristic = new Meteor.Collection("Heuristic")
+
+Evidence = new Meteor.Collection("Evidence")

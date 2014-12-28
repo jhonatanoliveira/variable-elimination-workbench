@@ -4,13 +4,13 @@
 	{{#each bn}}
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">{{name}} <span class="glyphicon glyphicon-minus-sign action-btn-panel btn-delete-bn" data-toggle="tooltip" data-placement="top" title="Delete BN"></span></h3>
+			<h3 class="panel-title">{{name}} <span class="glyphicon glyphicon-minus-sign action-btn-panel btn-delete-bn" data-toggle="tooltip" data-placement="top" title="Delete BN"></span> <span class="glyphicon glyphicon-pencil action-btn-panel btn-edit-bn" data-toggle="tooltip" data-placement="top" title="Delete BN"></span></h3>
 		</div>
 		<div class="panel-body">
 
 			<div class="row">
-			<div class="col-md-6">
 
+			<div class="col-md-4">
 			<button class="btn btn-primary btn-new-cpt">New CPT</button>
 			{{#if cpts}}
 			<hr>
@@ -28,10 +28,9 @@
 			</form>
 			{{/each}}
 			{{/if}}
-
 			</div>
-			<div class="col-md-6">
 
+			<div class="col-md-4">
 			<button class="btn btn-primary btn-new-variable">Define Variable</button>
 			{{#if variables}}
 			<hr>
@@ -45,8 +44,23 @@
 			</form>
 			{{/each}}
 			{{/if}}
-
 			</div>
+
+			<div class="col-md-4">
+			<button class="btn btn-primary btn-new-evidence">Define Evidence</button>
+			{{#if evidence}}
+			<hr>
+			{{#each evidence}}
+			<form class="form-inline" role="form">
+				<div class="form-group">
+					<label>{{name}}</label>
+					<button class="btn btn-danger btn-delete-evidence"><span class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Delete Evidence"></span></button>
+				</div>
+			</form>
+			{{/each}}
+			{{/if}}
+			</div>
+
 			</div>
 			<!-- Min neighbors -->
 			<hr>
@@ -70,7 +84,7 @@
 				<tr>
 					<td>
 						{{#each eliminationOrdering}}
-						{{name}} 
+						{{name}}
 						{{/each}}
 					</td>
 					{{#with counting}}
@@ -181,6 +195,44 @@
 					<th>Additions</th>
 				</tr>
 				{{#each countingsWmf}}
+				<tr>
+					<td>
+						{{#each eliminationOrdering}}
+						{{name}} 
+						{{/each}}
+					</td>
+					{{#with counting}}
+					<td>
+						{{multiplications}}
+					</td>
+					<td>
+						{{summations}}
+					</td>
+					{{/with}}
+				</tr>
+				{{/each}}
+			</table>
+			</div>
+			{{/if}}
+			<!-- Population's Energy -->
+			<hr>
+			<form class="form-inline" role="form">
+	  			<div class="form-group">
+					<input type="text" class="form-control variables-to-eliminate-pe" value="{{variablesToEliminatePe}}" placeholder = "Variables to eliminate">
+					<button class="btn btn-success btn-population-energy">Population's Energy</button>
+				</div>
+			</form>
+			{{#if countingsPe}}
+			<br>
+			<div class="panel panel-default">
+			<div class="panel-heading">Population's Energy Results</div>
+			<table class="table table-hover">
+				<tr>
+					<th>Elimination Orderings</th>
+					<th>Multiplications</th>
+					<th>Additions</th>
+				</tr>
+				{{#each countingsPe}}
 				<tr>
 					<td>
 						{{#each eliminationOrdering}}

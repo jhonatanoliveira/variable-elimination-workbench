@@ -13,3 +13,7 @@ Meteor.publish('all-variables-from-bayesian-networks', function(_bnId){
 Meteor.publish('all-heuristics-from-bayesian-networks', function(_bnId){
 	return Heuristic.find({bnId: _bnId})
 })
+
+Meteor.publish('all-evidence-from-bayesian-networks', function(_bnId){
+	return Evidence.find({bnId: _bnId})
+})

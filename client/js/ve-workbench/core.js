@@ -71,6 +71,19 @@ multiply = function(cpt1, cpt2) {
 
 // FUNCTION
 // Scores the current variables of the CPTs using Min Neighbors
+scorePopulationEnergy = function(variablesToScore, cpts, allVariables) {
+	var scores = {}
+	// Loop on each variable
+	for (var i = 0; i < variablesToScore.length; i++) {
+		var variable = Object.keys(variablesToScore[i])[0]
+		var countMultiplication = countComputations([variablesToScore[i]], cpts, allVariables)
+		scores[variable] = countMultiplication['multiplications']
+	}
+	return scores
+}
+
+// FUNCTION
+// Scores the current variables of the CPTs using Min Neighbors
 scoreMinNeighbor = function(variablesToScore, cpts, allVariables) {
 	var scores = {}
 	// Loop on each variable
@@ -335,7 +348,10 @@ findVariablesWithMinimunScore = function(scores, variables) {
 
 // FUNCTION
 // Performs a elimination orderings, counting the computations
-countComputations = function(eliminationOrdering,cpts,variables) {
+countComputations = function(eliminationOrdering, _cpts, variables, _evidence) {
+	var evidence = _evidence || []
+	var cpts = _cpts.slice(0)
+
 	countings = {'multiplications': 0, 'summations': 0}
 	for (var i = 0; i < eliminationOrdering.length; i++) {
 		// unroll variable value
@@ -352,7 +368,7 @@ countComputations = function(eliminationOrdering,cpts,variables) {
 			if (cpts[j].head.indexOf(variable) != -1 || cpts[j].tail.indexOf(variable) != -1) {
 				firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
 				product = multiply(product,cpts[j]) // multiply with the current product
-				if (!firstCpt) { countings['multiplications'] += countMultiplicationsOrSummations(product,variables) }
+				if (!firstCpt) { countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence) }
 				indexesToRemove.push(j)
 			}
 		}
@@ -361,8 +377,34 @@ countComputations = function(eliminationOrdering,cpts,variables) {
 			// remove original CPTs from the set
 			multisplice(cpts,indexesToRemove)
 			product = sumOut(variable,product)
-			countings['summations'] += countMultiplicationsOrSummations(product,variables)
+			countings['summations'] += countMultiplicationsOrSummations(product,variables,evidence)
 			cpts.push(product) // add the product to the set
+		}
+	}
+	// multiply all remaining variables
+	if (cpts.length > 1) {
+		var product = { head: [], tail: [] }
+		// Loop on all CPTs
+		var indexesToRemove = []
+		var firstCpt = true
+		for (var i = 0; i < cpts.length; i++) {
+			// no need to check if the variable is in the CPT
+			firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
+			product = multiply(product,cpts[i]) // multiply with the current product
+			if (!firstCpt) { countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence) }
+			indexesToRemove.push(i)
+		}
+		// Only do the rest of the modifications if the variable exist in some CPT
+		if (indexesToRemove.length != 0) {
+			// remove all variables on the "left hand side"
+			difference = arrDiff(product.head,evidence)
+			for (var i = 0; i < difference.length; i++) {
+				// remove original CPTs from the set
+				multisplice(cpts,indexesToRemove)
+				product = sumOut(difference[i],product)
+				countings['summations'] += countMultiplicationsOrSummations(product,variables,evidence)
+				cpts.push(product) // add the product to the set
+			}
 		}
 	}
 	return countings
@@ -370,20 +412,24 @@ countComputations = function(eliminationOrdering,cpts,variables) {
 
 // FUNCTION
 // count the multiplications or summations in CPT (multiplying the variable's cardinalities)
-countMultiplicationsOrSummations = function(cpt,variables) {
+countMultiplicationsOrSummations = function(cpt,variables,evidence) {
 	product = 1;
 	for (var i = 0; i < cpt.head.length; i++) {
-		product *= findValueOfObjectInArray(cpt.head[i],variables)
+		if (evidence.indexOf(cpt.head[i]) == -1) {
+			product *= findValueOfObjectInArray(cpt.head[i],variables)
+		}
 	}
 	for (var i = 0; i < cpt.tail.length; i++) {
-		product *= findValueOfObjectInArray(cpt.tail[i],variables)
+		if (evidence.indexOf(cpt.tail[i]) == -1) {
+			product *= findValueOfObjectInArray(cpt.tail[i],variables)
+		}
 	}
 	return product
 }
 
 // FUNCTION
 // count the multiplications or summations in CPT (multiplying the variable's cardinalities) for all possible elimination orderings
-countComputationsFromAllPossibleEliminationOrderings = function(variablesToEliminate,cpts,variables,scoringFunction) {
+countComputationsFromAllPossibleEliminationOrderings = function(variablesToEliminate,cpts,variables,evidence,scoringFunction) {
 
 	eliminationOrdering =[]
 	eliminationOrderings = []
@@ -393,7 +439,7 @@ countComputationsFromAllPossibleEliminationOrderings = function(variablesToElimi
 	for (var i = 0; i < eliminationOrderings.length; i++) {
 		var counting = {}
 		counting['eliminationOrdering'] = eliminationOrderings[i]
-		counting['counting'] = countComputations(eliminationOrderings[i], cpts.slice(0), variables.slice(0))
+		counting['counting'] = countComputations(eliminationOrderings[i], cpts.slice(0), variables.slice(0), evidence.slice(0))
 		countings.push(counting)
 	}
 

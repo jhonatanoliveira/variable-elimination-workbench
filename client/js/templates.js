@@ -12,9 +12,11 @@ Template.templateMenuLateral.rendered = function() {
    $("[data-toggle=tooltip]").tooltip()
 };
 
-Template.templateMenuLateral.bns = function() {
-	return BayesianNetwork.find({})
-}
+Template.templateMenuLateral.helpers({
+	bns: function() {
+		return BayesianNetwork.find({})
+	}
+})
 
 Template.templateMenuLateral.events({
 	'click .btn-new-bn': function(e) {
@@ -32,65 +34,62 @@ Template.templateMenuLateral.events({
 
 // CENTRAL BLOCK
 Template.templateCentral.rendered = function() {
-	console.log('renderizou')
    $("[data-toggle=tooltip]").tooltip()
 };
 
-Template.templateCentral.isCentralActivated = function() {
-	return Session.get('activatedBn')
-}
-
-Template.templateCentral.bn = function() {
-	return BayesianNetwork.find({_id: Session.get('activatedBn')})
-}
-
-Template.templateCentral.cpts = function() {
-	return Cpt.find({})
-}
-
-Template.templateCentral.variables = function() {
-	return Variable.find({})
-}
-
-Template.templateCentral.variablesToEliminateMn = function() {
-	var bnId = Session.get('activatedBn');
-	return Session.get('variablesToEliminateMn'+bnId)
-}
-
-Template.templateCentral.variablesToEliminateMw = function() {
-	var bnId = Session.get('activatedBn');
-	return Session.get('variablesToEliminateMw'+bnId)
-}
-
-Template.templateCentral.variablesToEliminateMf = function() {
-	var bnId = Session.get('activatedBn');
-	return Session.get('variablesToEliminateMf'+bnId)
-}
-
-Template.templateCentral.variablesToEliminateWmf = function() {
-	var bnId = Session.get('activatedBn');
-	return Session.get('variablesToEliminateWmf'+bnId)
-}
-
-Template.templateCentral.countingsMn = function() {
-	var bnId = Session.get('activatedBn')
-	return Session.get('countingsMn'+bnId)
-}
-
-Template.templateCentral.countingsMw = function() {
-	var bnId = Session.get('activatedBn')
-	return Session.get('countingsMw'+bnId)
-}
-
-Template.templateCentral.countingsMf = function() {
-	var bnId = Session.get('activatedBn')
-	return Session.get('countingsMf'+bnId)
-}
-
-Template.templateCentral.countingsWmf = function() {
-	var bnId = Session.get('activatedBn')
-	return Session.get('countingsWmf'+bnId)
-}
+Template.templateCentral.helpers({
+	isCentralActivated: function() {
+		return Session.get('activatedBn')
+	},
+	bn: function() {
+		return BayesianNetwork.find({_id: Session.get('activatedBn')},{sort: [["name","asc"]]})
+	},
+	cpts: function() {
+		return Cpt.find({})
+	},
+	variables: function() {
+		return Variable.find({})
+	},
+	evidence: function() {
+		return Evidence.find({})
+	},
+	variablesToEliminateMn: function() {
+		var bnId = Session.get('activatedBn');
+		return Session.get('variablesToEliminateMn'+bnId)
+	},
+	variablesToEliminateMw: function() {
+		var bnId = Session.get('activatedBn');
+		return Session.get('variablesToEliminateMw'+bnId)
+	},
+	variablesToEliminateMf: function() {
+		var bnId = Session.get('activatedBn');
+		return Session.get('variablesToEliminateMf'+bnId)
+	},
+	variablesToEliminateWmf: function() {
+		var bnId = Session.get('activatedBn');
+		return Session.get('variablesToEliminateWmf'+bnId)
+	},
+	countingsMn: function() {
+		var bnId = Session.get('activatedBn')
+		return Session.get('countingsMn'+bnId)
+	},
+	countingsMw: function() {
+		var bnId = Session.get('activatedBn')
+		return Session.get('countingsMw'+bnId)
+	},
+	countingsMf: function() {
+		var bnId = Session.get('activatedBn')
+		return Session.get('countingsMf'+bnId)
+	},
+	countingsWmf: function() {
+		var bnId = Session.get('activatedBn')
+		return Session.get('countingsWmf'+bnId)
+	},
+	countingsPe: function() {
+		var bnId = Session.get('activatedBn')
+		return Session.get('countingsPe'+bnId)
+	}
+})
 
 Template.templateCentral.events({
 	'click .btn-delete-bn': function(e) {
@@ -104,6 +103,14 @@ Template.templateCentral.events({
 					Variable.remove({_id: post._id})
 				})
 				BayesianNetwork.remove({_id: bnId})
+			}
+		})
+	},
+	'click .btn-edit-bn': function(e) {
+		var bnId = this._id
+		bootbox.prompt("New name for '"+this.name+"'", function(result) {                
+			if (result != null) {
+				BayesianNetwork.update(bnId, {$set: {name: result}})
 			}
 		})
 	},
@@ -149,6 +156,22 @@ Template.templateCentral.events({
 			}
 		})
 	},
+	'click .btn-new-evidence': function(e) {
+		bootbox.prompt("Please, type the name of the variable that is an evidence", function(result) {                
+			if (result != null) {
+				Evidence.insert({name: result, bnId: Session.get('activatedBn')})
+			}
+		})
+	},
+	'click .btn-delete-evidence': function(e) {
+		e.preventDefault()
+		var varId = this._id
+		bootbox.confirm("Are you sure?", function(result) {
+			if (result) {
+				Evidence.remove({_id: varId})
+			}
+		})
+	},
 	'click .btn-min-neighbors': function(e) {
 		e.preventDefault()
 		if (checkVariablesDefinition()) {
@@ -158,8 +181,9 @@ Template.templateCentral.events({
 		varToElim = varToElim.split(",")
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
+		var allEvidence = prepareAllEvidence()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinNeighbor)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,allEvidence,scoreMinNeighbor)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMn'+bnId,countings)
@@ -176,8 +200,9 @@ Template.templateCentral.events({
 		varToElim = varToElim.split(",")
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
+		var allEvidence = prepareAllEvidence()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinWeight)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,allEvidence,scoreMinWeight)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMw'+bnId,countings)
@@ -194,8 +219,9 @@ Template.templateCentral.events({
 		varToElim = varToElim.split(",")
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
+		var allEvidence = prepareAllEvidence()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreMinFill)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,allEvidence,scoreMinFill)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsMf'+bnId,countings)
@@ -212,11 +238,31 @@ Template.templateCentral.events({
 		varToElim = varToElim.split(",")
 		varToElim = prepareVarToEliminate(varToElim)
 		var allVars = prepareAllVariables()
+		var allEvidence = prepareAllEvidence()
 		var cpts = Cpt.find({}).fetch()
-		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,scoreWeightedMinFill)
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,allEvidence,scoreWeightedMinFill)
 		prepareCounting(countings)
 		var bnId = Session.get('activatedBn')
 		Session.set('countingsWmf'+bnId,countings)
+		} else {
+			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
+		}
+	},
+	'click .btn-population-energy': function(e) {
+		e.preventDefault()
+		if (checkVariablesDefinition()) {
+		var varToElim = $('.variables-to-eliminate-pe').val()
+		var bnId = Session.get('activatedBn');
+		Session.set('variablesToEliminatePe'+bnId,varToElim)
+		varToElim = varToElim.split(",")
+		varToElim = prepareVarToEliminate(varToElim)
+		var allVars = prepareAllVariables()
+		var allEvidence = prepareAllEvidence()
+		var cpts = Cpt.find({}).fetch()
+		var countings = countComputationsFromAllPossibleEliminationOrderings(varToElim,cpts,allVars,allEvidence,scorePopulationEnergy)
+		prepareCounting(countings)
+		var bnId = Session.get('activatedBn')
+		Session.set('countingsPe'+bnId,countings)
 		} else {
 			bootbox.alert("Please, check your variables definitions. Maybe you're missing some...");
 		}
@@ -265,6 +311,14 @@ function prepareAllVariables() {
 		varToElimPrepered.push(temp)
 	})
 	return varToElimPrepered
+}
+
+function prepareAllEvidence() {
+	var evidencePrepared = []
+	Evidence.find({}).forEach(function (post) {
+		evidencePrepared.push(post.name)
+	})
+	return evidencePrepared
 }
 
 function prepareCounting(countings) {

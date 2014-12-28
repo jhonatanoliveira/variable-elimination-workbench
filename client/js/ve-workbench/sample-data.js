@@ -1,4 +1,4 @@
-var _cpts = [
+cpts_ = [
 	{
 		head: ['a'],
 		tail: ['d']
@@ -21,7 +21,7 @@ var _cpts = [
 	}
 ]
 
-var _variables = [
+variables_ = [
 	{'a': 2},
 	{'b': 4},
 	{'c': 8},
@@ -29,13 +29,13 @@ var _variables = [
 	{'e': 2}
 ]
 
-var _variablesToEliminate = [
+variablesToEliminate_ = [
 	{'a': 2},
 	{'b': 4},
 	{'d': 3}
 ]
 
-var _cpts2 = [
+cpts2_ = [
 	{
 		head: ['a'],
 		tail: []
@@ -62,7 +62,7 @@ var _cpts2 = [
 	}
 ]
 
-var _variables2 = [
+variables2_ = [
 	{'a': 5},
 	{'b': 2},
 	{'c': 2},
@@ -71,9 +71,65 @@ var _variables2 = [
 	{'f': 2}
 ]
 
-var _variablesToEliminate2 = [
+variablesToEliminate2_ = [
 	{'a': 5},
 	{'b': 2},
 	{'c': 2},
 	{'e': 2}
 ]
+
+cptsEsbn = [
+	{
+		head: ['c'],
+		tail: []
+	},
+	{
+		head: ['d'],
+		tail: ['c']
+	},
+	{
+		head: ['g'],
+		tail: ['d','i']
+	},
+	{
+		head: ['i'],
+		tail: []
+	},
+	{
+		head: ['s'],
+		tail: ['i']
+	},
+	{
+		head: ['l'],
+		tail: ['g']
+	},
+	{
+		head: ['j'],
+		tail: ['l','s']
+	},
+	{
+		head: ['h'],
+		tail: ['g','j']
+	}
+]
+
+variablesEsbn = [
+	{'c': 2},
+	{'d': 2},
+	{'g': 2},
+	{'i': 2},
+	{'s': 2},
+	{'l': 2},
+	{'j': 2},
+	{'h': 2}
+]
+
+variablesToEliminateEsbn = [
+	{'s': 2},
+	{'l': 2},
+	{'i': 2},
+	{'g': 2},
+	{'d': 2}
+]
+
+evidenceEsbn = ['h','j']
