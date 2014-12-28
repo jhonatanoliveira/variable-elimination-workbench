@@ -352,7 +352,7 @@ countComputations = function(eliminationOrdering, _cpts, variables, _evidence) {
 	var evidence = _evidence || []
 	var cpts = _cpts.slice(0)
 
-	countings = {'multiplications': 0, 'summations': 0}
+	countings = {'multiplications': 0, 'summations': 0, 'divisions': 0}
 	for (var i = 0; i < eliminationOrdering.length; i++) {
 		// unroll variable value
 		var variable = ''
@@ -391,7 +391,11 @@ countComputations = function(eliminationOrdering, _cpts, variables, _evidence) {
 			// no need to check if the variable is in the CPT
 			firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
 			product = multiply(product,cpts[i]) // multiply with the current product
-			if (!firstCpt) { countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence) }
+			if (!firstCpt) {
+				var partialResult = countMultiplicationsOrSummations(product,variables,evidence)
+				countings['multiplications'] += partialResult
+				countings['divisions'] += partialResult
+			}
 			indexesToRemove.push(i)
 		}
 		// Only do the rest of the modifications if the variable exist in some CPT

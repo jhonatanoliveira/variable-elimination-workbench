@@ -132,4 +132,12 @@ variablesToEliminateEsbn = [
 	{'d': 2}
 ]
 
+variablesToEliminateEsbn2 = [
+	{'s': 2},
+	{'l': 2},
+	{'c': 2},
+	{'d': 2},
+	{'g': 2}
+]
+
 evidenceEsbn = ['h','j']
