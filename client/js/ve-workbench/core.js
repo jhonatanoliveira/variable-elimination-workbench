@@ -382,33 +382,31 @@ countComputations = function(eliminationOrdering, _cpts, variables, _evidence) {
 		}
 	}
 	// multiply all remaining variables
-	if (cpts.length > 1) {
-		var product = { head: [], tail: [] }
-		// Loop on all CPTs
-		var indexesToRemove = []
-		var firstCpt = true
-		for (var i = 0; i < cpts.length; i++) {
-			// no need to check if the variable is in the CPT
-			firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
-			product = multiply(product,cpts[i]) // multiply with the current product
-			if (!firstCpt) {
-				countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence)
-			}
-			indexesToRemove.push(i)
+	var product = { head: [], tail: [] }
+	// Loop on all CPTs
+	var indexesToRemove = []
+	var firstCpt = true
+	for (var i = 0; i < cpts.length; i++) {
+		// no need to check if the variable is in the CPT
+		firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
+		product = multiply(product,cpts[i]) // multiply with the current product
+		if (!firstCpt) {
+			countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence)
 		}
-		// Count Divisions, before creating Evidence Table
-		countings['divisions'] += countMultiplicationsOrSummations(product,variables,evidence)
-		// Only do the rest of the modifications if the variable exist in some CPT
-		if (indexesToRemove.length != 0) {
-			// remove all variables on the "left hand side"
-			difference = arrDiff(product.head,evidence)
-			for (var i = 0; i < difference.length; i++) {
-				// remove original CPTs from the set
-				multisplice(cpts,indexesToRemove)
-				product = sumOut(difference[i],product)
-				countings['summations'] += countMultiplicationsOrSummations(product,variables,evidence)
-				cpts.push(product) // add the product to the set
-			}
+		indexesToRemove.push(i)
+	}
+	// Count Divisions, before creating Evidence Table
+	countings['divisions'] += countMultiplicationsOrSummations(product,variables,evidence)
+	// Only do the rest of the modifications if the variable exist in some CPT
+	if (indexesToRemove.length != 0) {
+		// remove all variables on the "left hand side"
+		difference = arrDiff(product.head,evidence)
+		for (var i = 0; i < difference.length; i++) {
+			// remove original CPTs from the set
+			multisplice(cpts,indexesToRemove)
+			product = sumOut(difference[i],product)
+			countings['summations'] += countMultiplicationsOrSummations(product,variables,evidence)
+			cpts.push(product) // add the product to the set
 		}
 	}
 	return countings
