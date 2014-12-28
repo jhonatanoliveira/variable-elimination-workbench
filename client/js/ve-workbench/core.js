@@ -392,12 +392,12 @@ countComputations = function(eliminationOrdering, _cpts, variables, _evidence) {
 			firstCpt = (product.head.length == 0 && product.tail.length == 0) ? true : false
 			product = multiply(product,cpts[i]) // multiply with the current product
 			if (!firstCpt) {
-				var partialResult = countMultiplicationsOrSummations(product,variables,evidence)
-				countings['multiplications'] += partialResult
-				countings['divisions'] += partialResult
+				countings['multiplications'] += countMultiplicationsOrSummations(product,variables,evidence)
 			}
 			indexesToRemove.push(i)
 		}
+		// Count Divisions, before creating Evidence Table
+		countings['divisions'] += countMultiplicationsOrSummations(product,variables,evidence)
 		// Only do the rest of the modifications if the variable exist in some CPT
 		if (indexesToRemove.length != 0) {
 			// remove all variables on the "left hand side"
